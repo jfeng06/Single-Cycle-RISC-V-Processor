@@ -1,4 +1,12 @@
 32-bit Single Cycle RISC-V (Reduced Instruction Set Computer 5) Processor using Verilog
 Contains:
-- alu_types.svh (Arithmetic Logic Unit Types): assigns an name for the operation in alu module to give readable names to commands 
-- alu_sv (Arithmetic Logic Unit Operations): assigns the operations for the alu_types 
+- alu_types.svh (Arithmetic Logic Unit Types): Defines the alu_op_e enumerated type, mapping highly readable command names (like ALU_ADD and ALU_SUB) to their corresponding 4-bit control codes.
+- alu.sv (Arithmetic Logic Unit): Performs the fundamental arithmetic, logical, and shift operations (such as addition, subtraction, bitwise AND/OR, and logical/arithmetic shifts) on operands based on the selected control operation , while outputting the calculation result and a zero detection flag.
+- alu_control.sv (ALU Control Unit): Acts as the localized decoder, combining the 2-bit ALUOp signal from the main controller with the instruction's funct3 field and funct7 bit 5 to determine the precise 4-bit operation code for the ALU.
+- control.sv (Main Control Unit): Decodes the instruction's 7-bit opcode to generate the primary datapath control signals, such as register write enables, multiplexer select signals, memory read/write commands, and branch flags.
+- cpu.sv (Central Processing Unit Motherboard): Serves as the top-level structural wrapper , instantiating all processor modules and routing the physical control and data buses (including the program counter, ALU operands, and write-back multiplexers).
+- data_memory.sv (Data Memory): Provides synchronous write-access and asynchronous read-access to a 256-word storage array, simulating RAM for executing Load Word (LW) and Store Word (SW) instructions.imm_gen.sv (Immediate Generator): Extracts and sign-extends immediate values from various instruction formats (such as I-type, S-type, B-type, U-type, and J-type) to format them into a uniform 32-bit output for the datapath.
+- instruction_memory.sv (Instruction Memory): Implements a read-only 256-word array that stores compiled machine code and outputs the 32-bit instruction corresponding to the address pointed to by the program counter.
+- progcount.sv (Program Counter): Houses the 32-bit instruction pointer register , updating synchronously on the rising edge of the clock to either point to the next sequential instruction (PC + 4) or jump to a branch target.
+- regfile.sv (Register File): Simulates the 32 internal CPU registers , supporting simultaneous dual asynchronous reads (via registers rs1 and rs2) and a synchronous write to register rd on the rising edge of the clock.
+- testbench.sv (CPU Testbench): Establishes the simulation environment by generating the master clock and system reset signals, creating wave dump files (dump.vcd) for graphical analysis, and terminating the run after execution.
